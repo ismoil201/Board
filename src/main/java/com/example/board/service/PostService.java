@@ -2,7 +2,10 @@ package com.example.board.service;
 
 import com.example.board.model.Post;
 import com.example.board.model.PostPostRequestBody;
+import com.example.board.model.PostUpdateRequestBody;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -38,5 +41,34 @@ public class PostService {
 
        postList.add(newPost);
        return  newPost;
+    }
+
+    public Post upDatePost(Long postId, PostUpdateRequestBody postUpdateRequestBody) {
+
+        Optional<Post> updatePost = postList.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+
+        if(updatePost.isPresent()){
+
+            Post post = updatePost.get();
+            post.setBody(postUpdateRequestBody.body());
+
+            return post;
+        }else {
+            throw  new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found");
+        }
+
+    }
+
+    public void deletePost(Long postId) {
+        Optional<Post> updatePost = postList.stream().filter(post -> postId.equals(post.getPostId())).findFirst();
+
+        if(updatePost.isPresent()){
+
+           postList.remove(updatePost.get());
+
+
+        }else {
+            throw  new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found");
+        }
     }
 }

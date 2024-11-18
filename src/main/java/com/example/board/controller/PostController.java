@@ -2,6 +2,7 @@ package com.example.board.controller;
 
 import com.example.board.model.Post;
 import com.example.board.model.PostPostRequestBody;
+import com.example.board.model.PostUpdateRequestBody;
 import com.example.board.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,4 +50,21 @@ public class PostController {
     }
 
 
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<Post> upDatePost(@PathVariable Long postId,
+                                           @RequestBody PostUpdateRequestBody postUpdateRequestBody){
+
+      var upDatePost =   postService.upDatePost(postId, postUpdateRequestBody);
+
+      return ResponseEntity.ok(upDatePost);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> upDatePost(@PathVariable Long postId){
+
+           postService.deletePost(postId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
