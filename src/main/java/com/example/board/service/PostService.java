@@ -1,6 +1,5 @@
 package com.example.board.service;
 
-
 import com.example.board.model.Post;
 import com.example.board.model.PostPostRequestBody;
 import org.springframework.stereotype.Service;
