@@ -1,0 +1,21 @@
+spring:
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      # create / create-drop / update / validate / none
+      ddl-auto: create-drop
+      format_sql: true
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/newdb
+    username: postgres
+    password: 1234
+
+  security:
+    user:
+      name: board-admin
+      password: board-admin-password

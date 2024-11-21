@@ -32,11 +32,9 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable Long postId){
 
-        Optional<Post> matchingPost = postService.getPostById(postId);
+       var  matchingPost = postService.getPostById(postId);
 
-       return matchingPost
-                .map(post -> ResponseEntity.ok(post))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+       return ResponseEntity.ok(matchingPost);
     }
 
 
