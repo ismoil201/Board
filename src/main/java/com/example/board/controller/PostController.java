@@ -2,6 +2,8 @@ package com.example.board.controller;
 
 import com.example.board.model.Post;
 import com.example.board.model.PostPostRequestBody;
+import com.example.board.model.PostUpdateRequestBody;
+import com.example.board.model.entity.PostEntity;
 import com.example.board.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,11 +33,9 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable Long postId){
 
-        Optional<Post> matchingPost = postService.getPostById(postId);
+       var post = postService.getPostById(postId);
 
-       return matchingPost
-                .map(post -> ResponseEntity.ok(post))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+       return ResponseEntity.ok(post);
     }
 
 
@@ -43,10 +43,32 @@ public class PostController {
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody){
 
+
+
        Post post = postService.createPost(postPostRequestBody);
 
        return ResponseEntity.ok(post);
     }
 
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<Post> updatePost(@PathVariable Long postId,
+                                           @RequestBody PostUpdateRequestBody postUpdateRequestBody){
+
+       Post updatePost = postService.updatePost(postId, postUpdateRequestBody);
+
+
+       return  ResponseEntity.ok(updatePost);
+    }
+
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Post> deletePost(@PathVariable Long postId){
+
+        postService.deletePost(postId);
+
+        return ResponseEntity.noContent().build();
+
+    }
 
 }

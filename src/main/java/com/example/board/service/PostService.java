@@ -2,8 +2,20 @@ package com.example.board.service;
 
 import com.example.board.model.Post;
 import com.example.board.model.PostPostRequestBody;
+import com.example.board.model.PostUpdateRequestBody;
+import com.example.board.model.entity.PostEntity;
+import com.example.board.repository.PostEntityRepository;
+import org.apache.tomcat.jni.Pool;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.parser.Entity;
+import java.lang.module.ResolutionException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,30 +25,57 @@ import java.util.Optional;
 public class PostService {
 
 
-    private static  final List<Post> postList = new ArrayList<>();
+    @Autowired
+    private PostEntityRepository postEntityRepository;
 
-    static{
-        postList.add(new Post(1L,"Post1", ZonedDateTime.now()));
-        postList.add(new Post(2L,"Post2", ZonedDateTime.now()));
-        postList.add(new Post(3L,"Post3", ZonedDateTime.now()));
+
+    public List<Post> getPostList() {
+
+        var postEntities = postEntityRepository.findAllPostsOrdered();
+        return postEntities.stream().map(Post::from).toList();
     }
 
-    public List<Post> getPostList(){
-        return postList;
-    }
 
+    public Post getPostById(Long id) {
 
-    public Optional<Post>  getPostById(Long id){
-        return  postList.stream().filter(post -> id.equals(post.getPostId())).findFirst();
+        var postEntity = postEntityRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+        return Post.from(postEntity);
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody) {
 
-       Long newPostId =  postList.stream().mapToLong(Post::getPostId).max().orElse(0L)+1;
+        PostEntity newPostEntity =  new PostEntity();
+        newPostEntity.setBody(postPostRequestBody.body());
 
-       var newPost = new Post(newPostId, postPostRequestBody.body(), ZonedDateTime.now());
+       var savedEntity =  postEntityRepository.save(newPostEntity);
 
-       postList.add(newPost);
-       return  newPost;
+        return Post.from(savedEntity);
+    }
+
+    public Post updatePost(Long updateId, PostUpdateRequestBody postUpdateRequestBody) {
+
+        var postEntity = postEntityRepository.findById(updateId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        postEntity.setBody(postUpdateRequestBody.body());
+
+        var savedEntity =  postEntityRepository.save(postEntity);
+
+      return Post.from(savedEntity);
+
+
+    }
+
+    public void deletePost(Long postId) {
+
+
+        var postEntity = postEntityRepository.findById(postId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        postEntityRepository.delete(postEntity);
     }
 }
