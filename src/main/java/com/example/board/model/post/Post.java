@@ -1,11 +1,9 @@
-package com.example.board.model;
+package com.example.board.model.post;
 
 import com.example.board.model.entity.PostEntity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Post (
