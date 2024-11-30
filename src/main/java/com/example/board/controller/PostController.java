@@ -1,5 +1,6 @@
 package com.example.board.controller;
 
+import com.example.board.model.entity.UserEntity;
 import com.example.board.model.post.Post;
 import com.example.board.model.post.PostPostRequestBody;
 import com.example.board.model.post.PostUpdateRequestBody;
@@ -8,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,11 +45,12 @@ public class PostController {
 
     //POST =/posts
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody)
+    public ResponseEntity<Post> createPost(@RequestBody PostPostRequestBody postPostRequestBody
+    , Authentication authentication)
     {
 
         logger.info("POST api/v1/posts");
-        Post post = postService.createPost(postPostRequestBody);
+        Post post = postService.createPost(postPostRequestBody, (UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.ok(post);
     }
@@ -54,9 +58,10 @@ public class PostController {
 
     @PatchMapping("/{postId}")
     public ResponseEntity<Post> updatePost(@PathVariable Long postId,
-                                           @RequestBody PostUpdateRequestBody postUpdateRequestBody) {
+                                           @RequestBody PostUpdateRequestBody postUpdateRequestBody,
+                                           Authentication authentication) {
         logger.info("PATCH api/v1/posts/{postId}");
-        Post updatePost = postService.updatePost(postId, postUpdateRequestBody);
+        Post updatePost = postService.updatePost(postId, postUpdateRequestBody, (UserEntity) authentication.getPrincipal());
 
 
         return ResponseEntity.ok(updatePost);
@@ -64,10 +69,10 @@ public class PostController {
 
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Post> deletePost(@PathVariable Long postId) {
+    public ResponseEntity<Post> deletePost(@PathVariable Long postId, Authentication authentication) {
 
         logger.info("DELETE api/v1/posts/{postId}");
-        postService.deletePost(postId);
+        postService.deletePost(postId, (UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.noContent().build();
 

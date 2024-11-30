@@ -14,7 +14,8 @@ import java.util.Random;
 
 
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "\"user\"",
+indexes = {@Index(name = "user_username_idx", columnList = "username",unique = true) })
 @SQLDelete(sql = "UPDATE \"user\" SET deleteddatetime = CURRENT_TIMESTAMP where postid = ?")
 @SQLRestriction("deleteddatetime is null")
 public class UserEntity implements UserDetails {

@@ -1,12 +1,10 @@
 package com.example.board.service;
 
 import com.example.board.exception.user.UserAlreadyExistsException;
+import com.example.board.exception.user.UserNotAllowedException;
 import com.example.board.exception.user.UserNotFoundException;
 import com.example.board.model.entity.UserEntity;
-import com.example.board.model.user.User;
-import com.example.board.model.user.UserAuthenticationResponse;
-import com.example.board.model.user.UserUpdateRequestBody;
-import com.example.board.model.user.UserUserRequestBody;
+import com.example.board.model.user.*;
 import com.example.board.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +28,6 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private JwtService jwtService;
-
 
 
     @Override
@@ -58,18 +55,58 @@ public class UserService implements UserDetailsService {
     }
 
     public UserAuthenticationResponse authenticate(String username, String password) {
-       var userEntity =  userEntityRepository
+        var userEntity = userEntityRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
 
-       if(passwordEncoder.matches(password, userEntity.getPassword())){
+        if (passwordEncoder.matches(password, userEntity.getPassword())) {
 
-           var accessToken = jwtService.generateAccessToken(userEntity);
-           return new UserAuthenticationResponse(accessToken);
-       }else {
+            var accessToken = jwtService.generateAccessToken(userEntity);
+            return new UserAuthenticationResponse(accessToken);
+        } else {
 
-           throw new UserNotFoundException(username);
-       }
+            throw new UserNotFoundException(username);
+        }
 
+    }
+
+    public List<User> getUsers(String query) {
+
+        List<UserEntity> userEntities;
+
+        if (query != null && !query.isBlank()) {
+
+            userEntities = userEntityRepository.findByUsernameContaining(query);
+        } else {
+            userEntities = userEntityRepository.findAll();
+        }
+
+        return userEntities.stream().map(User::from).toList();
+    }
+
+    public User getUser(String username) {
+        var userEntity = userEntityRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+        return  User.from(userEntity);
+    }
+
+    public User upDateUser(
+            String username, UserPatchRequestBody userPatchRequestBody, UserEntity currentUserEntity) {
+
+        var userEntity = userEntityRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+        if(!userEntity.equals(currentUserEntity)){
+            throw new UserNotAllowedException();
+        }
+
+        if (userPatchRequestBody.description() != null) {
+            userEntity.setDescription(userPatchRequestBody.description());
+        }
+
+       return User.from( userEntityRepository.save(userEntity));
     }
 }
