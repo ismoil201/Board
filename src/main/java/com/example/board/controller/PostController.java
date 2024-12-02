@@ -69,12 +69,21 @@ public class PostController {
 
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Post> deletePost(@PathVariable Long postId, Authentication authentication) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, Authentication authentication) {
 
         logger.info("DELETE api/v1/posts/{postId}");
         postService.deletePost(postId, (UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.noContent().build();
+
+    }
+
+    @PostMapping("/{postId}/likes")
+    public ResponseEntity<Post> toggleLike(@PathVariable Long postId, Authentication authentication) {
+
+      var post =   postService.toggleLike(postId, (UserEntity) authentication.getPrincipal());
+
+        return ResponseEntity.ok(post);
 
     }
 
