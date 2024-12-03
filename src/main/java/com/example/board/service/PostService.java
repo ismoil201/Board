@@ -32,19 +32,26 @@ public class PostService {
     private LikeEntityRepository likeEntityRepository;
 
 
-    public List<Post> getPostList() {
+    public List<Post> getPostList(UserEntity currentUser) {
 
         var postEntities = postEntityRepository.findAllPostsOrdered();
-        return postEntities.stream().map(Post::from).toList();
+        return postEntities.stream().map(
+                postEntity -> getPostWithLikingStatus(postEntity, currentUser)
+        ).toList();
     }
 
 
-    public Post getPostById(Long postId) {
+    private Post getPostWithLikingStatus(PostEntity postEntity, UserEntity currentUser) {
+        var isLiking = likeEntityRepository.findByUserAndPostEntity(currentUser, postEntity).isPresent();
+        return Post.from(postEntity, isLiking);
+    }
+    public Post getPostById(Long postId, UserEntity currentUser) {
 
         var postEntity = postEntityRepository.findById(postId).orElseThrow(
                 () -> new PostNotFoundException(postId)
         );
-        return Post.from(postEntity);
+
+        return getPostWithLikingStatus(postEntity, currentUser);
     }
 
     public Post createPost(PostPostRequestBody postPostRequestBody, UserEntity userEntity) {
@@ -89,14 +96,16 @@ public class PostService {
         postEntityRepository.delete(postEntity);
     }
 
-    public List<Post> getPostByUsername(String username) {
+    public List<Post> getPostByUsername(String username, UserEntity currentUser) {
         var userEntity = userEntityRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
 
-        var postEntity = postEntityRepository.findByUser(userEntity);
+        var postEntities = postEntityRepository.findByUser(userEntity);
 
-        return postEntity.stream().map(Post::from).toList();
+        return postEntities.stream().map(
+                postEntity -> getPostWithLikingStatus(postEntity, currentUser)
+        ).toList();
     }
 
     @Transactional
@@ -104,19 +113,19 @@ public class PostService {
         var postEntity = postEntityRepository.findById(postId).orElseThrow(
                 () -> new PostNotFoundException(postId));
 
-        var likeEntity = likeEntityRepository.findByUserAndPost(currentUser,postEntity);
+        var likeEntity = likeEntityRepository.findByUserAndPostEntity(currentUser, postEntity);
 
 
-        if(likeEntity.isPresent()) {
+        if (likeEntity.isPresent()) {
             likeEntityRepository.delete(likeEntity.get());
             postEntity.setLikesCount(Math.max(0, postEntity.getLikesCount() - 1));
-
-        }else {
+            return Post.from(postEntityRepository.save(postEntity), false);
+        } else {
 
             likeEntityRepository.save(LikeEntity.of(currentUser, postEntity));
             postEntity.setLikesCount(postEntity.getLikesCount() + 1);
+            return Post.from(postEntityRepository.save(postEntity), true);
         }
 
-        return Post.from(postEntityRepository.save(postEntity));
     }
 }

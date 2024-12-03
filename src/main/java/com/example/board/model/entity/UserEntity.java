@@ -15,7 +15,7 @@ import java.util.Random;
 
 @Entity
 @Table(name = "\"user\"",
-indexes = {@Index(name = "user_username_idx", columnList = "username",unique = true) })
+        indexes = {@Index(name = "user_username_idx", columnList = "username", unique = true)})
 @SQLDelete(sql = "UPDATE \"user\" SET deleteddatetime = CURRENT_TIMESTAMP where postid = ?")
 @SQLRestriction("deleteddatetime is null")
 public class UserEntity implements UserDetails {
@@ -38,6 +38,12 @@ public class UserEntity implements UserDetails {
     private String description;
 
     @Column
+    private Long followersCount = 0L;
+
+    @Column
+    private Long followingsCount = 0L;
+
+    @Column
     private ZonedDateTime createdDateTime;
 
     @Column
@@ -45,6 +51,9 @@ public class UserEntity implements UserDetails {
 
     @Column
     private ZonedDateTime deletedDateTime;
+
+    @Column
+    private  Boolean isFollowing;
 
 
     public Long getUserId() {
@@ -79,6 +88,22 @@ public class UserEntity implements UserDetails {
         this.description = description;
     }
 
+    public Long getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(Long followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public Long getFollowingsCount() {
+        return followingsCount;
+    }
+
+    public void setFollowingsCount(Long followingsCount) {
+        this.followingsCount = followingsCount;
+    }
+
     public ZonedDateTime getCreatedDateTime() {
         return createdDateTime;
     }
@@ -101,6 +126,29 @@ public class UserEntity implements UserDetails {
 
     public void setDeletedDateTime(ZonedDateTime deletedDateTime) {
         this.deletedDateTime = deletedDateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(userId, that.userId) && Objects.equals(username, that.username) && Objects.equals(password, that.password) && Objects.equals(profile, that.profile) && Objects.equals(description, that.description) && Objects.equals(followersCount, that.followersCount) && Objects.equals(followingsCount, that.followingsCount) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updatedDateTime, that.updatedDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, username, password, profile, description, followersCount, followingsCount, createdDateTime, updatedDateTime, deletedDateTime);
+    }
+
+    public static UserEntity of(String username, String password) {
+        var userEntity = new UserEntity();
+        userEntity.setUsername(username);
+        userEntity.setPassword(password);
+
+        userEntity.setProfile("https://avatar.iran.liara.run/public/" + (new Random().nextInt(100) + 1));
+
+        return userEntity;
     }
 
     @Override
@@ -137,43 +185,6 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public static UserEntity of(String username, String password) {
-        var userEntity = new UserEntity();
-        userEntity.setUsername(username);
-        userEntity.setPassword(password);
-
-        userEntity.setProfile("https://avatar.iran.liara.run/public/" + (new Random().nextInt(100)+1));
-
-        return userEntity;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserEntity that = (UserEntity) o;
-        return Objects.equals(userId, that.userId)
-                && Objects.equals(username, that.username)
-                && Objects.equals(password, that.password)
-                && Objects.equals(profile, that.profile)
-                && Objects.equals(description, that.description)
-                && Objects.equals(createdDateTime, that.createdDateTime)
-                && Objects.equals(updatedDateTime, that.updatedDateTime)
-                && Objects.equals(deletedDateTime, that.deletedDateTime);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getUserId(),
-                getUsername(),
-                getPassword(),
-                getProfile(),
-                getDescription(),
-                getCreatedDateTime(),
-                getUpdatedDateTime(),
-                getDeletedDateTime());
     }
 
 

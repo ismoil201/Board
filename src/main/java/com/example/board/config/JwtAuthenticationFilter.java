@@ -48,10 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var securityContext = SecurityContextHolder.getContext();
 
 
-//        if(ObjectUtils.isEmpty(authentication)|| !authentication.startsWith(BEARER_PREFIX)){
-//            throw new JwtTokenNotFoundException();
-//        }
-
         if (!ObjectUtils.isEmpty(authentication) && authentication.startsWith(BEARER_PREFIX)
                 && securityContext.getAuthentication() == null) {
 

@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "\"like\"",
-        indexes = {@Index(name = "reply_userid_idx", columnList = "userid, postid", unique = true)})
+        indexes = {@Index(name = "like_userid_postid_idx", columnList = "userid, postid", unique = true)})
 
 public class LikeEntity {
 

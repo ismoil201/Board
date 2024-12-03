@@ -23,5 +23,9 @@ public interface LikeEntityRepository extends JpaRepository<LikeEntity, Long> {
     @Query("SELECT r FROM LikeEntity r WHERE r.postEntity = :postEntity")
     List<LikeEntity> findByPost(@Param("postEntity") PostEntity postEntity);
 
-    Optional<LikeEntity> findByUserAndPost(UserEntity user, PostEntity post);
+
+    @Query("SELECT l FROM LikeEntity l WHERE l.user = :userEntity AND l.postEntity = :postEntity")
+    Optional<LikeEntity> findByUserAndPostEntity(@Param("userEntity") UserEntity userEntity, @Param("postEntity") PostEntity postEntity);
+
+//    Optional<LikeEntity> findByUserAndPost(UserEntity user, PostEntity post);
 }
