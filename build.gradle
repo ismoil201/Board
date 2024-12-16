@@ -22,25 +22,38 @@ configurations {
 repositories {
     mavenCentral()
 }
-
 dependencies {
+    // Spring Boot starters
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // JSON Web Token (JWT) kutubxonasi
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // PostgreSQL uchun JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Lombok (kodni qisqartirish uchun)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-    // Testing
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Security testlar uchun
     testImplementation 'org.springframework.security:spring-security-test'
 
+    // Spring Boot testlari
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // JUnit platformasini sinov uchun
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Faqatgina dasturlash vaqtida ishlatiladigan vositalar
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

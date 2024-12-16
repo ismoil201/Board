@@ -19,3 +19,14 @@ spring:
     user:
       name: board-admin
       password: board-admin-password
+logging:
+  level:
+    # TRACE < DEBUG < INFO < WARN < ERROR
+    root: INFO
+#logging:
+#  level:
+#    org.hibernate.type: TRACE
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
+#    org.springframework.orm.jpa: DEBUG
+#    org.springframework.transaction: DEBUG

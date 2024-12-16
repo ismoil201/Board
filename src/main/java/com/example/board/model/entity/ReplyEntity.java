@@ -1,7 +1,6 @@
 package com.example.board.model.entity;
 
 
-import com.example.board.model.post.Post;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -10,26 +9,19 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "post",
-        indexes = {@Index(name = "post_userid_idx", columnList = "userid")})
-@SQLDelete(sql = "UPDATE \"post\" SET deleteddatetime = CURRENT_TIMESTAMP where postid = ?")
+@Table(name = "reply",
+        indexes = {@Index(name = "reply_userid_idx", columnList = "userid"),
+                @Index(name = "reply_postid_idx", columnList = "userid")})
+@SQLDelete(sql = "UPDATE \"reply\" SET deleteddatetime = CURRENT_TIMESTAMP where replyid = ?")
 @SQLRestriction("deleteddatetime is null")
-public class PostEntity {
+public class ReplyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long replyId;
 
     @Column(columnDefinition = "TEXT")
     private String body;
-
-    @Column
-    private  Long repliesCount = 0L;
-
-
-    @Column
-    private  Long likesCount = 0L;
-
     @Column
     private ZonedDateTime createdDateTime;
     @Column
@@ -41,12 +33,17 @@ public class PostEntity {
     @JoinColumn(name = "userid")
     private UserEntity user;
 
-    public Long getPostId() {
-        return postId;
+
+    @ManyToOne
+    @JoinColumn(name = "postid")
+    private PostEntity postEntity;
+
+    public Long getReplyId() {
+        return replyId;
     }
 
-    public void setPostId(Long postId) {
-        this.postId = postId;
+    public void setReplyId(Long replyId) {
+        this.replyId = replyId;
     }
 
     public String getBody() {
@@ -55,22 +52,6 @@ public class PostEntity {
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public Long getRepliesCount() {
-        return repliesCount;
-    }
-
-    public void setRepliesCount(Long repliesCount) {
-        this.repliesCount = repliesCount;
-    }
-
-    public Long getLikesCount() {
-        return likesCount;
-    }
-
-    public void setLikesCount(Long likesCount) {
-        this.likesCount = likesCount;
     }
 
     public ZonedDateTime getCreatedDateTime() {
@@ -105,27 +86,33 @@ public class PostEntity {
         this.user = user;
     }
 
+    public PostEntity getPostEntity() {
+        return postEntity;
+    }
+
+    public void setPostEntity(PostEntity postEntity) {
+        this.postEntity = postEntity;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PostEntity post = (PostEntity) o;
-        return Objects.equals(postId, post.postId) && Objects.equals(body, post.body) && Objects.equals(repliesCount, post.repliesCount) && Objects.equals(likesCount, post.likesCount) && Objects.equals(createdDateTime, post.createdDateTime) && Objects.equals(updateDateTime, post.updateDateTime) && Objects.equals(deletedDateTime, post.deletedDateTime) && Objects.equals(user, post.user);
+        ReplyEntity that = (ReplyEntity) o;
+        return Objects.equals(replyId, that.replyId) && Objects.equals(body, that.body) && Objects.equals(createdDateTime, that.createdDateTime) && Objects.equals(updateDateTime, that.updateDateTime) && Objects.equals(deletedDateTime, that.deletedDateTime) && Objects.equals(user, that.user) && Objects.equals(postEntity, that.postEntity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(postId, body, repliesCount, likesCount, createdDateTime, updateDateTime, deletedDateTime, user);
+        return Objects.hash(replyId, body, createdDateTime, updateDateTime, deletedDateTime, user, postEntity);
     }
 
-    public  static PostEntity of(String body, UserEntity user) {
-
-        PostEntity post = new PostEntity();
-        post.setBody(body);
-        post.setUser(user);
-
-        return post;
+    public static ReplyEntity of(String body, UserEntity user, PostEntity postEntity) {
+        var reply = new ReplyEntity();
+        reply.setBody(body);
+        reply.setUser(user);
+        reply.setPostEntity(postEntity);
+        return reply;
     }
 
     @PrePersist
