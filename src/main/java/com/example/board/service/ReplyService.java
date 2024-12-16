@@ -103,4 +103,14 @@ public class ReplyService {
     }
 
 
+    public List<Reply> getRepliesByUser(String username) {
+        var user = userEntityRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+
+       var replyEntities =  replytEntityRepository.findByUser(user);
+
+       return replyEntities.stream().map(Reply::from).toList();
+    }
 }

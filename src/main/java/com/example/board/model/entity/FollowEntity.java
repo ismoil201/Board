@@ -12,6 +12,8 @@ import java.util.Objects;
 
 public class FollowEntity {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long followId;

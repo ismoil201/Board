@@ -4,7 +4,9 @@ import com.example.board.model.entity.UserEntity;
 import com.example.board.model.post.Post;
 import com.example.board.model.post.PostPostRequestBody;
 import com.example.board.model.post.PostUpdateRequestBody;
+import com.example.board.model.user.LikedUser;
 import com.example.board.service.PostService;
+import com.example.board.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class PostController {
     @Autowired
     PostService postService;
 
+    @Autowired
+    UserService userService;
+
     @GetMapping
     public ResponseEntity<List<Post>> getPosts(Authentication authentication) {
         logger.info("GET /api/v1/posts");
@@ -34,12 +39,22 @@ public class PostController {
 
 
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long postId, Authentication authentication) {
+    public ResponseEntity<Post> getPostByPostId(@PathVariable Long postId, Authentication authentication) {
 
         logger.info("GET api/v1/posts/{postId}");
         var post = postService.getPostById(postId,(UserEntity) authentication.getPrincipal());
 
         return ResponseEntity.ok(post);
+    }
+
+    @GetMapping("/{postId}/liked-users")
+    public ResponseEntity<List<LikedUser>> getLikedUsersByPostId
+            (@PathVariable Long postId, Authentication authentication) {
+
+       var likedUsers =
+               userService.getLikedUsersByPostId(postId, (UserEntity) authentication.getPrincipal());
+
+        return ResponseEntity.ok(likedUsers);
     }
 
 
